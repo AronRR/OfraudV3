@@ -12,7 +12,7 @@ export class DbService implements OnModuleInit, OnModuleDestroy{
             host: 'localhost',
             user: 'root',
             password: 'Aroneflaco12&',
-            database: '4521_demo',
+            database: '451_demo',
         })
     }
     onModuleDestroy() {
