@@ -5,14 +5,15 @@ import { TokenService } from "./tokens.service";
 import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/common/guards/jwt-auth.guard";
 import type { AuthenticatedRequest } from "src/common/interfaces/authenticated-request";
-import { ApiBearerAuth } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiTags("Autenticación")
 @Controller("auth")
 export class AuthController{
     constructor(private readonly tokenService: TokenService,
         private readonly userService: UserService
     ){}
-    
+
     @Post("login")
     async login(@Body() dto:{email:string, password:string}){
         const usuario= await this.userService.login(dto.email, dto.password);
@@ -34,14 +35,26 @@ export class AuthController{
     @Post("refresh")
     async refresh(@Body() dto: {refreshToken: string}){
         try{
-            const profile= await this.tokenService.verifyRefresh(dto.refreshToken);
-            const user= await this.userService.findById(Number(profile.sub));
+            const payload= await this.tokenService.verifyRefresh(dto.refreshToken);
+            const user= await this.userService.findById(Number(payload.sub));
             if(!user) throw Error("Usuario no encontrado");
             const newAccessToken = await this.tokenService.generateAccess({id: user.id.toString(), email: user.email, name: user.name});
             return {accessToken: newAccessToken};
         }catch{
             throw Error("Token de refresco inválido");
         }
+    }
+
+    @Post("logout")
+    async logout(@Body() dto: {refreshToken: string}){
+        await this.tokenService.revokeRefresh(dto.refreshToken);
+        return { success: true };
+    }
+
+    @Post("logout-all")
+    async logoutAll(@Body() dto: {userId: number}){
+        await this.tokenService.revokeAllForUser(dto.userId);
+        return { success: true };
     }
 
 }
