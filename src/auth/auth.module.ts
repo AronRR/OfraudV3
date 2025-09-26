@@ -1,14 +1,14 @@
 /* eslint-disable prettier/prettier */
 
-import { Module } from "@nestjs/common";
-import { UserModule } from "src/users/user.module";
-import { AuthController } from "./auth.controller";
-import { TokenService } from "./tokens.service";
-
+import { Module } from '@nestjs/common';
+import { UserModule } from 'src/users/user.module';
+import { AuthController } from './auth.controller';
+import { TokenService } from './tokens.service';
+import { RefreshTokenRepository } from './refresh-token.repository';
 
 @Module({
     imports: [UserModule],
     controllers: [AuthController],
-    providers: [TokenService]
+    providers: [TokenService, RefreshTokenRepository]
 })
 export class AuthModule {}

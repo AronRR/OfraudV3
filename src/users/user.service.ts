@@ -32,4 +32,9 @@ export class UserService {
         return this.userRepository.findById(id);
     }
 
+    async updatePassword(id:number, newPassword:string):Promise<void>{
+        const hashed = sha256(newPassword);
+        await this.userRepository.updatePassword(id, hashed);
+    }
+
 }
